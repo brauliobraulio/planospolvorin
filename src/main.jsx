@@ -1,9 +1,9 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import Polvorin from "./Polvorin.jsx";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import Polvorin from './polvorin.jsx'
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Polvorin />
-  </React.StrictMode>
-);
+  </React.StrictMode>,
+)
