@@ -171,6 +171,9 @@ function Leader({ x1, y1, x2, y2, label, align = "left" }) {
 export default function Polvorin() {
   const [d, setD] = useState(DEFAULT);
   const [tab, setTab] = useState("general");
+  const [copiedPlanta,    setCopiedPlanta]    = useState(false);
+  const [copiedPerfil,    setCopiedPerfil]    = useState(false);
+  const [copiedPararrayo, setCopiedPararrayo] = useState(false);
 
   const handle = useCallback((e) => {
     const { name, value, type } = e.target;
@@ -285,6 +288,40 @@ export default function Polvorin() {
     img.src = url;
   };
 
+  const copyToClipboard = (svgId, setCopied) => {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    const w = svg.width.baseVal.value;
+    const h = svg.height.baseVal.value;
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svg);
+    const svgBlob = new Blob([svgStr], {type: "image/svg+xml;charset=utf-8"});
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const scale = 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = w * scale;
+      canvas.height = h * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => {
+        navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob })
+        ]).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }).catch(() => alert("Tu navegador no permite copiar imágenes al portapapeles."));
+      }, "image/png");
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); alert("Error al copiar"); };
+    img.src = url;
+  };
+
   const labelStyle = {background:"#555",color:"#fff",padding:"4px 12px",fontSize:11,fontWeight:"bold",fontFamily:"Arial",letterSpacing:1};
 
   /* ── render ─────────────────────────────────────────────────────────────── */
@@ -396,6 +433,7 @@ export default function Polvorin() {
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={labelStyle}>VISTA DE PLANTA</div>
               <button onClick={()=>downloadSvgAsPng("svg-planta","vista-planta.png")} style={{padding:"3px 10px",fontSize:11,background:"#2c5f9e",color:"#fff",border:"none",borderRadius:3,cursor:"pointer"}}>⬇ PNG</button>
+              <button onClick={()=>copyToClipboard("svg-planta",setCopiedPlanta)} style={{padding:"3px 10px",fontSize:11,background:copiedPlanta?"#2a7a3b":"#555",color:"#fff",border:"none",borderRadius:3,cursor:"pointer",transition:"background 0.3s"}}>{copiedPlanta?"✓ Copiado":"📋 Copiar"}</button>
             </div>
             <div style={{background:"#fff",border:"2px solid #888",boxShadow:"3px 3px 10px rgba(0,0,0,.35)"}}>
               <svg id="svg-planta" width={svgW} height={svgH} style={{display:"block"}}>
@@ -473,6 +511,7 @@ export default function Polvorin() {
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={labelStyle}>VISTA DE PERFIL</div>
               <button onClick={()=>downloadSvgAsPng("svg-perfil","vista-perfil.png")} style={{padding:"3px 10px",fontSize:11,background:"#2c5f9e",color:"#fff",border:"none",borderRadius:3,cursor:"pointer"}}>⬇ PNG</button>
+              <button onClick={()=>copyToClipboard("svg-perfil",setCopiedPerfil)} style={{padding:"3px 10px",fontSize:11,background:copiedPerfil?"#2a7a3b":"#555",color:"#fff",border:"none",borderRadius:3,cursor:"pointer",transition:"background 0.3s"}}>{copiedPerfil?"✓ Copiado":"📋 Copiar"}</button>
             </div>
             <div style={{background:"#fff",border:"2px solid #888",boxShadow:"3px 3px 10px rgba(0,0,0,.35)"}}>
               <svg id="svg-perfil" width={svgW} height={svgPRH} style={{display:"block"}}>
@@ -532,6 +571,7 @@ export default function Polvorin() {
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={labelStyle}>CROQUIS DE UN PARARRAYOS</div>
               <button onClick={()=>downloadSvgAsPng("svg-pararrayos","croquis-pararrayos.png")} style={{padding:"3px 10px",fontSize:11,background:"#2c5f9e",color:"#fff",border:"none",borderRadius:3,cursor:"pointer"}}>⬇ PNG</button>
+              <button onClick={()=>copyToClipboard("svg-pararrayos",setCopiedPararrayo)} style={{padding:"3px 10px",fontSize:11,background:copiedPararrayo?"#2a7a3b":"#555",color:"#fff",border:"none",borderRadius:3,cursor:"pointer",transition:"background 0.3s"}}>{copiedPararrayo?"✓ Copiado":"📋 Copiar"}</button>
             </div>
             <div style={{background:"#fff",border:"2px solid #888",boxShadow:"3px 3px 10px rgba(0,0,0,.35)"}}>
               <svg id="svg-pararrayos" width={svgW} height={svgPR_H} style={{display:"block"}}>
